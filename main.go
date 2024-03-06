@@ -35,8 +35,7 @@ func main() {
 	encodedImage := base64.StdEncoding.EncodeToString(imageData)
 
 	payload, err := json.Marshal(map[string]interface{}{
-		"username": getUsername(),
-		"avatar":   "data:image/gif;base64," + encodedImage,
+		"avatar": "data:image/gif;base64," + encodedImage,
 	})
 	if err != nil {
 		fmt.Println("Error creating request body:", err)
@@ -68,46 +67,4 @@ func main() {
 
 	fmt.Println("Avatar changed successfully! It may take a few seconds to update.")
 	fmt.Scanf("h")
-}
-
-func getUsername() string {
-	url := discordAPI + "/users/@me"
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return ""
-	}
-
-	req.Header.Set("Authorization", "Bot "+token)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Println("Error sending request:", err)
-		return ""
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Error response status:", resp.Status)
-		fmt.Println("Check if your token is correct and if your bot has the necessary permissions.")
-		return ""
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return ""
-	}
-
-	var response struct {
-		Username string `json:"username"`
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		fmt.Println("Error parsing response body:", err)
-		return ""
-	}
-
-	return response.Username
 }
